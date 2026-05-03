@@ -1,3 +1,41 @@
+# =====================================================
+# CONFIGURACIÓN GENERAL
+# =====================================================
 spring:
   application:
     name: api-geo-cl
+
+  # ===================================================
+  # BASE DE DATOS
+  # ===================================================
+  datasource:
+    url: jdbc:postgresql://localhost:5432/db_api_geo_cl
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  # ===================================================
+  # JPA / HIBERNATE
+  # ===================================================
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: create-drop
+    defer-datasource-initialization: true
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  # ===================================================
+  # DATOS INICIALES
+  # ===================================================
+  sql:
+    init:
+      mode: always
+
+# =====================================================
+# SERVIDOR
+# =====================================================
+server:
+  port: 8080
