@@ -1,18 +1,29 @@
+### Maven ###
 target/
+.mvn/
+
+### VS Code ###
+.vscode/
+
+### macOS ###
+.DS_Store
+
+### Git ###
 .git/
 .gitignore
-.vscode/
-.idea/
-*.iml
-*.iws
-*.ipr
-.DS_Store
-src/main/resources/application-local.yml
-src/main/resources/application-local.yaml
+.gitattributes
+
+### Tests ###
 src/test/
 
-# Archivos de configuración de Docker
-Dockerfile
-docker-compose.yml
-
+### Environment & Credentials ###
 .env
+.env.*
+!.env.example
+src/main/resources/application-local.yml
+src/main/resources/application-local.yaml
+
+### Docs ###
+HELP.md
+LICENSE
+README.md
