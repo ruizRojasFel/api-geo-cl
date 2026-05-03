@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RegionService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">api-geo-cl</a> &gt; <a href="index.source.html" class="el_package">cl.felruiz.apigeocl.service</a> &gt; <span class="el_source">RegionService.java</span></div><h1>RegionService.java</h1><pre class="source lang-java linenums">package cl.felruiz.apigeocl.service;
+
+import java.util.Comparator;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import cl.felruiz.apigeocl.dto.ComunaDTO;
+import cl.felruiz.apigeocl.dto.ProvinciaDTO;
+import cl.felruiz.apigeocl.dto.RegionDTO;
+import cl.felruiz.apigeocl.exception.ResourceNotFoundException;
+import cl.felruiz.apigeocl.mapper.ComunaMapper;
+import cl.felruiz.apigeocl.mapper.ProvinciaMapper;
+import cl.felruiz.apigeocl.mapper.RegionMapper;
+import cl.felruiz.apigeocl.model.Region;
+import cl.felruiz.apigeocl.repository.ComunaRepository;
+import cl.felruiz.apigeocl.repository.ProvinciaRepository;
+import cl.felruiz.apigeocl.repository.RegionRepository;
+import cl.felruiz.apigeocl.util.TextUtils;
+import lombok.RequiredArgsConstructor;
+
+/**
+ * Service con la lógica de negocio para Regiones.
+ *
+ * La búsqueda por nombre usa doble normalización: 1. TextUtils.normalizar() →
+ * normaliza el input del usuario (Java) 2. translate() + LOWER() → normaliza
+ * los datos en la BD (PostgreSQL)
+ *
+ * Esto permite búsquedas robustas que ignoran: - Tildes: &quot;nuble&quot; encuentra
+ * &quot;Ñuble&quot; - Mayúsculas: &quot;BIOBIO&quot; encuentra &quot;Biobío&quot; - Espacios: &quot; los rios &quot;
+ * encuentra &quot;Los Ríos&quot;
+ */
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class RegionService {
+
+  private final RegionRepository regionRepository;
+  private final ProvinciaRepository provinciaRepository;
+  private final RegionMapper regionMapper;
+  private final ProvinciaMapper provinciaMapper;
+  private final ComunaMapper comunaMapper;
+  private final ComunaRepository comunaRepository;
+
+  public List&lt;RegionDTO&gt; obtenerTodas() {
+<span class="fc" id="L48">    return regionRepository.findAll()</span>
+<span class="fc" id="L49">        .stream()</span>
+<span class="fc" id="L50">        .map(regionMapper::toDTO)</span>
+<span class="fc" id="L51">        .toList();</span>
+  }
+
+  public RegionDTO obtenerPorId(Long id) {
+<span class="fc" id="L55">    return regionRepository.findById(id)</span>
+<span class="fc" id="L56">        .map(regionMapper::toDTO)</span>
+<span class="fc" id="L57">        .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Región con id &quot; + id + &quot; no encontrada&quot;));</span>
+  }
+
+  /**
+   * Busca regiones por nombre con normalización robusta.
+   *
+   * Flujo: 1. Usuario envía: &quot; ÑUBLE &quot; 2. TextUtils.normalizar() → &quot;nuble&quot; 3.
+   * Repository busca con translate() en la BD 4. &quot;Ñuble&quot; en BD → translate →
+   * &quot;nuble&quot; → MATCH ✅
+   */
+
+  public List&lt;RegionDTO&gt; buscarPorNombre(String nombre) {
+<span class="fc" id="L69">    String normalizado = TextUtils.normalizar(nombre);</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">    if (normalizado.isEmpty()) {</span>
+<span class="fc" id="L71">      return List.of();</span>
+    }
+
+<span class="fc" id="L74">    return regionRepository.findByNombreNormalizado(normalizado)</span>
+<span class="fc" id="L75">        .stream()</span>
+<span class="fc" id="L76">        .map(regionMapper::toDTO)</span>
+<span class="fc" id="L77">        .toList();</span>
+  }
+
+  public List&lt;ProvinciaDTO&gt; obtenerProvinciasPorRegion(Long regionId) {
+<span class="fc bfc" id="L81" title="All 2 branches covered.">    if (!regionRepository.existsById(regionId)) {</span>
+<span class="fc" id="L82">      throw new ResourceNotFoundException(&quot;Región con id &quot; + regionId + &quot; no encontrada&quot;);</span>
+    }
+
+<span class="fc" id="L85">    return provinciaRepository.findByRegionId(regionId)</span>
+<span class="fc" id="L86">        .stream()</span>
+<span class="fc" id="L87">        .map(provinciaMapper::toDTO)</span>
+<span class="fc" id="L88">        .toList();</span>
+  }
+
+  public List&lt;ComunaDTO&gt; obtenerComunasPorNombreRegion(String nombre) {
+<span class="fc" id="L92">    String normalizado = TextUtils.normalizar(nombre);</span>
+
+<span class="fc" id="L94">    Region region = regionRepository.findByNombreNormalizadoExact(normalizado)</span>
+<span class="fc" id="L95">        .orElseThrow(() -&gt; new ResourceNotFoundException(</span>
+            &quot;Región con nombre '&quot; + nombre + &quot;' no encontrada&quot;));
+
+<span class="fc" id="L98">    return comunaRepository.findByProvinciaRegionId(region.getId()).stream()</span>
+<span class="fc" id="L99">        .map(comunaMapper::toDTO)</span>
+<span class="fc" id="L100">        .sorted(Comparator.comparing(ComunaDTO::getNombre))</span>
+<span class="fc" id="L101">        .toList();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

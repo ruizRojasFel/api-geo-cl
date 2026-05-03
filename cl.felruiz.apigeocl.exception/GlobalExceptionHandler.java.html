@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GlobalExceptionHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">api-geo-cl</a> &gt; <a href="index.source.html" class="el_package">cl.felruiz.apigeocl.exception</a> &gt; <span class="el_source">GlobalExceptionHandler.java</span></div><h1>GlobalExceptionHandler.java</h1><pre class="source lang-java linenums">package cl.felruiz.apigeocl.exception;
+
+import java.time.LocalDateTime;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import cl.felruiz.apigeocl.dto.ErrorDTO;
+
+/**
+ * Manejador global de excepciones.
+ *
+ * @RestControllerAdvice → intercepta excepciones de TODOS
+ * los controllers y devuelve respuestas JSON personalizadas
+ * en lugar de la &quot;Whitelabel Error Page&quot; por defecto de Spring.
+ *
+ * Sin esto: try-catch repetido en cada controller.
+ * Con esto: el manejo de errores está centralizado aquí.
+ *
+ * Orden de los handlers:
+ *   1. handleNotFound      → 404 (recurso no encontrado)
+ *   2. handleMissingParam  → 400 (parámetro requerido faltante)
+ *   3. handleGeneral       → 500 (cualquier otro error no controlado)
+ */
+@RestControllerAdvice
+<span class="fc" id="L29">public class GlobalExceptionHandler {</span>
+
+  /**
+   * Captura ResourceNotFoundException → devuelve HTTP 404.
+   */
+  @ExceptionHandler(ResourceNotFoundException.class)
+  public ResponseEntity&lt;ErrorDTO&gt; handleNotFound(ResourceNotFoundException ex) {
+<span class="fc" id="L36">    ErrorDTO error = ErrorDTO.builder()</span>
+<span class="fc" id="L37">      .status(HttpStatus.NOT_FOUND.value())</span>
+<span class="fc" id="L38">      .error(&quot;Not Found&quot;)</span>
+<span class="fc" id="L39">      .mensaje(ex.getMessage())</span>
+<span class="fc" id="L40">      .timestamp(LocalDateTime.now())</span>
+<span class="fc" id="L41">      .build();</span>
+
+<span class="fc" id="L43">    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);</span>
+  }
+
+  /**
+   * Captura parámetros requeridos faltantes → devuelve HTTP 400.
+   */
+  @ExceptionHandler(MissingServletRequestParameterException.class)
+  public ResponseEntity&lt;ErrorDTO&gt; handleMissingParam(MissingServletRequestParameterException ex) {
+<span class="fc" id="L51">    ErrorDTO error = ErrorDTO.builder()</span>
+<span class="fc" id="L52">      .status(HttpStatus.BAD_REQUEST.value())</span>
+<span class="fc" id="L53">      .error(&quot;Bad Request&quot;)</span>
+<span class="fc" id="L54">      .mensaje(&quot;Parámetro requerido '&quot; + ex.getParameterName() + &quot;' no encontrado&quot;)</span>
+<span class="fc" id="L55">      .timestamp(LocalDateTime.now())</span>
+<span class="fc" id="L56">      .build();</span>
+
+<span class="fc" id="L58">    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);</span>
+  }
+
+  /**
+   * Captura cualquier excepción no controlada → devuelve HTTP 500.
+   * Este SIEMPRE debe ser el último handler.
+   */
+  @ExceptionHandler(Exception.class)
+  public ResponseEntity&lt;ErrorDTO&gt; handleGeneral(Exception ex) {
+<span class="fc" id="L67">    ErrorDTO error = ErrorDTO.builder()</span>
+<span class="fc" id="L68">      .status(HttpStatus.INTERNAL_SERVER_ERROR.value())</span>
+<span class="fc" id="L69">      .error(&quot;Internal Server Error&quot;)</span>
+<span class="fc" id="L70">      .mensaje(&quot;Ocurrió un error inesperado&quot;)</span>
+<span class="fc" id="L71">      .timestamp(LocalDateTime.now())</span>
+<span class="fc" id="L72">      .build();</span>
+
+<span class="fc" id="L74">    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

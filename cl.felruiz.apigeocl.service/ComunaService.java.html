@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ComunaService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">api-geo-cl</a> &gt; <a href="index.source.html" class="el_package">cl.felruiz.apigeocl.service</a> &gt; <span class="el_source">ComunaService.java</span></div><h1>ComunaService.java</h1><pre class="source lang-java linenums">package cl.felruiz.apigeocl.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import cl.felruiz.apigeocl.dto.ComunaDTO;
+import cl.felruiz.apigeocl.exception.ResourceNotFoundException;
+import cl.felruiz.apigeocl.mapper.ComunaMapper;
+import cl.felruiz.apigeocl.repository.ComunaRepository;
+import cl.felruiz.apigeocl.util.TextUtils;
+import lombok.RequiredArgsConstructor;
+
+/**
+ * Service con la lógica de negocio para Comunas.
+ *
+ * La búsqueda por nombre usa doble normalización:
+ * 1. TextUtils.normalizar() → normaliza el input del usuario (Java)
+ * 2. translate() + LOWER() → normaliza los datos en la BD (PostgreSQL)
+ *
+ * Esto permite búsquedas robustas que ignoran:
+ *   - Tildes:      &quot;concepcion&quot; encuentra &quot;Concepción&quot;
+ *   - Mayúsculas:  &quot;SANTIAGO&quot; encuentra &quot;Santiago&quot;
+ *   - Espacios:    &quot;  san pedro  &quot; encuentra &quot;San Pedro de la Paz&quot;
+ *   - Ñ:           &quot;nunoa&quot; encuentra &quot;Ñuñoa&quot;
+ */
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class ComunaService {
+
+  private final ComunaRepository comunaRepository;
+  private final ComunaMapper comunaMapper;
+
+  public List&lt;ComunaDTO&gt; obtenerTodas() {
+<span class="fc" id="L38">    return comunaRepository.findAll()</span>
+<span class="fc" id="L39">        .stream()</span>
+<span class="fc" id="L40">        .map(comunaMapper::toDTO)</span>
+<span class="fc" id="L41">        .toList();</span>
+  }
+
+  public ComunaDTO obtenerPorId(Long id) {
+<span class="fc" id="L45">    return comunaRepository.findById(id)</span>
+<span class="fc" id="L46">        .map(comunaMapper::toDTO)</span>
+<span class="fc" id="L47">        .orElseThrow(() -&gt;</span>
+<span class="fc" id="L48">            new ResourceNotFoundException(&quot;Comuna con id &quot; + id + &quot; no encontrada&quot;)</span>
+        );
+  }
+
+  /**
+   * Busca comunas por nombre con normalización robusta.
+   *
+   * Flujo:
+   *   1. Usuario envía: &quot;  CONCEPCIÓN  &quot;
+   *   2. TextUtils.normalizar() → &quot;concepcion&quot;
+   *   3. Repository busca con translate() en la BD
+   *   4. &quot;Concepción&quot; en BD → translate → &quot;concepcion&quot; → MATCH ✅
+   */
+  
+  public List&lt;ComunaDTO&gt; buscarPorNombre(String nombre) {
+<span class="fc" id="L63">    String normalizado = TextUtils.normalizar(nombre);</span>
+<span class="fc bfc" id="L64" title="All 2 branches covered.">    if (normalizado.isEmpty()) return List.of();</span>
+
+<span class="fc" id="L66">    return comunaRepository.findByNombreNormalizado(normalizado)</span>
+<span class="fc" id="L67">        .stream()</span>
+<span class="fc" id="L68">        .map(comunaMapper::toDTO)</span>
+<span class="fc" id="L69">        .toList();</span>
+  }
+
+  public List&lt;ComunaDTO&gt; obtenerComunasPorRegion(Long regionId) {
+<span class="fc" id="L73">    return comunaRepository.findByProvinciaRegionId(regionId)</span>
+<span class="fc" id="L74">        .stream()</span>
+<span class="fc" id="L75">        .map(comunaMapper::toDTO)</span>
+<span class="fc" id="L76">        .toList();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

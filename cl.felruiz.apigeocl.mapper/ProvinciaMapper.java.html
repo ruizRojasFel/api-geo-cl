@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProvinciaMapper.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">api-geo-cl</a> &gt; <a href="index.source.html" class="el_package">cl.felruiz.apigeocl.mapper</a> &gt; <span class="el_source">ProvinciaMapper.java</span></div><h1>ProvinciaMapper.java</h1><pre class="source lang-java linenums">package cl.felruiz.apigeocl.mapper;
+
+import org.springframework.stereotype.Component;
+
+import cl.felruiz.apigeocl.dto.ProvinciaDTO;
+import cl.felruiz.apigeocl.model.Provincia;
+
+/**
+ * Mapper para convertir entre Provincia (entidad) y ProvinciaDTO.
+ */
+@Component
+<span class="fc" id="L12">public class ProvinciaMapper {</span>
+
+  /**
+   * Convierte Provincia (entidad JPA) → ProvinciaDTO.
+   * Navega la relación provincia → region para obtener
+   * el contexto de la región sin una consulta extra.
+   */
+  public ProvinciaDTO toDTO(Provincia provincia) {
+<span class="fc bfc" id="L20" title="All 2 branches covered.">    if (provincia == null) return null;</span>
+
+<span class="fc" id="L22">    return ProvinciaDTO.builder()</span>
+<span class="fc" id="L23">      .id(provincia.getId())</span>
+<span class="fc" id="L24">      .nombre(provincia.getNombre())</span>
+<span class="fc" id="L25">      .capital(provincia.getCapital())</span>
+<span class="fc" id="L26">      .regionId(provincia.getRegion().getId())</span>
+<span class="fc" id="L27">      .regionNombre(provincia.getRegion().getNombre())</span>
+<span class="fc" id="L28">      .build();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
