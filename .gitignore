@@ -43,3 +43,11 @@ logs/
 # Environment (si usas múltiples archivos)
 .env.*
 !.env.example
+
+# =========================
+# AGREGADAS POR FEL
+# =========================
+.env
+.DS_Store/
+src/main/resources/application-local.yml
+.vscode/
