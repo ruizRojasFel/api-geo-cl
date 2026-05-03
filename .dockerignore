@@ -27,3 +27,6 @@ src/main/resources/application-local.yaml
 HELP.md
 LICENSE
 README.md
+
+### GitHub ###
+.github/
