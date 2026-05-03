@@ -1,0 +1,55 @@
+# =====================================================
+# Docker Compose — Orquesta app + PostgreSQL
+# =====================================================
+# Un solo comando levanta todo: docker compose up
+services:
+
+  # ===================================================
+  # Base de datos PostgreSQL
+  # ===================================================
+  db:
+    image: postgres:16-alpine
+    container_name: db_api_geo_cl
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      # Persiste los datos aunque el contenedor se elimine
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ===================================================
+  # Aplicación Spring Boot
+  # ===================================================
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: api_geo_cl
+    ports:
+      - "8080:8080"
+    environment:
+      # Spring Boot lee estas variables de entorno
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${DB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
+      SPRING_JPA_SHOW_SQL: "true"
+      SPRING_JPA_OPEN_IN_VIEW: "false"
+      SPRING_SQL_INIT_MODE: always
+      SPRING_JPA_DEFER_DATASOURCE_INITIALIZATION: "true"
+    depends_on:
+      db:
+        # Espera a que PostgreSQL esté listo antes de iniciar la app
+        condition: service_healthy
+
+# Volumen persistente para PostgreSQL
+volumes:
+  postgres_data:

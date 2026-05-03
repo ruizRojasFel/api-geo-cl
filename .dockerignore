@@ -1,0 +1,18 @@
+target/
+.git/
+.gitignore
+.vscode/
+.idea/
+*.iml
+*.iws
+*.ipr
+.DS_Store
+src/main/resources/application-local.yml
+src/main/resources/application-local.yaml
+src/test/
+
+# Archivos de configuración de Docker
+Dockerfile
+docker-compose.yml
+
+.env
