@@ -1,0 +1,29 @@
+### Maven ###
+target/
+.mvn/
+
+### VS Code ###
+.vscode/
+
+### macOS ###
+.DS_Store
+
+### Git ###
+.git/
+.gitignore
+.gitattributes
+
+### Tests ###
+src/test/
+
+### Environment & Credentials ###
+.env
+.env.*
+!.env.example
+src/main/resources/application-local.yml
+src/main/resources/application-local.yaml
+
+### Docs ###
+HELP.md
+LICENSE
+README.md
