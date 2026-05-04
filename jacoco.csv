@@ -10,4 +10,5 @@ api-geo-cl,cl.felruiz.apigeocl.controller,ProvinciaController,0,23,0,0,0,4,0,4,0
 api-geo-cl,cl.felruiz.apigeocl.controller,RegionController,0,29,0,0,0,5,0,5,0,5
 api-geo-cl,cl.felruiz.apigeocl.exception,GlobalExceptionHandler,0,57,0,0,0,22,0,4,0,4
 api-geo-cl,cl.felruiz.apigeocl.exception,ResourceNotFoundException,0,4,0,0,0,2,0,1,0,1
+api-geo-cl,cl.felruiz.apigeocl.util,CorsConfig,0,49,0,0,0,6,0,2,0,2
 api-geo-cl,cl.felruiz.apigeocl.util,TextUtils,0,19,0,4,0,5,0,3,0,1
