@@ -135,9 +135,21 @@ En `main`:
 - `http://localhost:3001`
 - `https://front-apis.vercel.app`
 
-## Autoría y licencia
+---
 
-- Desarrollado por **Felipe Andres Ruiz Rojas**
-- LinkedIn: [https://www.linkedin.com/in/felandres](https://www.linkedin.com/in/felandres)
-- Copyright © 2026-presente Felipe Andres Ruiz Rojas
-- Licencia: **MIT** (ver `LICENSE`).
+## Developer
+
+### **Felipe Andrés Ruiz Rojas**
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-felandres-blue?logo=linkedin)](https://www.linkedin.com/in/felandres)
+[![Website](https://img.shields.io/badge/Website-%40felruiz--dev-lightblue)](https://felruiz-dev.vercel.app/)
+
+---
+
+## License
+
+[![License](https://img.shields.io/badge/License-MIT-yellow)](https://github.com/ruizRojasFel/api-geo-cl?tab=MIT-1-ov-file)
+
+---
+
+Copyright © 2026 Felipe Andrés Ruiz Rojas.
